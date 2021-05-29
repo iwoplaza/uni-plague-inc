@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100&display=swap');
+
+$default-font: 'Montserrat', sans-serif;
+$header-font: $default-font;
+
+body {
+    margin: 0;
+
+    background-color: #333;
+    color: white;
+
+    font-family: $default-font;
+}
+
+h1 {
+    font-family: $header-font;
+    font-weight: normal;
+    font-size: 3rem;
+}
+
+.main-header {
+    text-align: center;
+}
+
+.canvas-wrapper {
+    display: flex;
+    justify-content: center;
+    
+    #canvas {
+        border: 1px solid white;
+    }
+}
