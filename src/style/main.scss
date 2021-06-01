@@ -18,8 +18,12 @@ body {
     min-height: 100vh;
 }
 
-.canvas-wrapper {
-    #canvas {
-        
+.time-manipulation {
+    display: flex;
+    flex-direction: row;
+    align-self: flex-end;
+
+    & > * {
+        margin: 0 10px;
     }
 }

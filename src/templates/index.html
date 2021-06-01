@@ -8,11 +8,15 @@
 </head>
 <body>
     <div class="container">
+        <section class="time-manipulation">
+            <input type="range" id="time-speed" min="0" max="16" value="1" step="1">
+            <span><span id="time-speed-value">1</span> day per second</span>
+        </section>
         <main class="canvas-wrapper">
             <canvas id="canvas"></canvas>
         </main>
-        <section class="box">
-            Currently hovering: <span id="hovering"></span>
+        <section>
+            <span>Day: <span id="day-counter">0</span></span>
         </section>
     </div>
 </body>
