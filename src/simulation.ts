@@ -133,13 +133,7 @@ export class Simulation {
         this.performStep();
     
         //canvasContext.stroke(countryPath);
-        //canvasContext.fill(countryPath);
-
-        // Updating the UI
-        const dayCounter = document.getElementById('day-counter');
-        if (dayCounter) {
-            dayCounter.innerText = this.day.toString();
-        }
+        //canvasContext.fill(countryPath); 
     }
 
     infectCell(x: number, y: number) {
