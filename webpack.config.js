@@ -19,7 +19,7 @@ module.exports = function (env, argv) {
     },
     devtool: development ? 'inline-source-map' : undefined,
     devServer: {
-      contentBase: './dist',
+      contentBase: './docs',
     },
     module: {
       rules: [
@@ -44,7 +44,7 @@ module.exports = function (env, argv) {
     },
     output: {
       filename: '[name].js',
-      path: path.resolve(__dirname, 'dist')
+      path: path.resolve(__dirname, 'docs')
     },
     plugins: [
       new HtmlWebpackPlugin({
