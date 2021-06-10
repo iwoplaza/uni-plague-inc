@@ -198,10 +198,10 @@ export class Simulation {
                 }
 
                 cell.advanceCurrentState();
-
-                this.render();
             }
         }
+
+        this.render();
 
         this.day++;
 
