@@ -10,16 +10,14 @@ body {
 }
 
 .container {
+    width: 80%;
+    margin: auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 
     min-height: 100vh;
-
-    & > * {
-        padding: 30px;
-    }
 }
 
 .canvas-wrapper {
@@ -28,6 +26,7 @@ body {
 
 #canvas {
     width: 50vw;
+    max-width: 500px;
 }
 
 .time-manipulation {
@@ -43,7 +42,8 @@ body {
 }
 
 .chart-container {
-    flex-grow: 1;
+    flex: 0 0 50%;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }

@@ -19,7 +19,7 @@ interface IParams {
 
 class Params implements IParams {
     get externalInfectionProbability() {
-        return 0.001;
+        return 0.1;
     }
 
     get internalInfectionProbability() {
