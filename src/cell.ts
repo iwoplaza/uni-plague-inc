@@ -53,11 +53,11 @@ const INFECTED_COLOR: Color = { r: 1, g: 0, b: 0 };
 const RECOVERED_COLOR: Color = { r: 0, g: 0, b: 1 };
 const DEAD_COLOR: Color = { r: 0, g: 0, b: 0 };
 
-interface CellState {
-    susceptible: number;
-    infectious: number;
-    recovered: number;
-    dead: number;
+export interface CellState {
+    susceptible: number;    // Amount of susceptable people in the region
+    infectious: number;     // Amount of infectious people in the region
+    recovered: number;      // Amount of recovered people in the region
+    dead: number;           // Amount of dead people in the region
 }
 
 export function infectInState(state: CellState, amount: number): void {
@@ -166,8 +166,6 @@ export class Cell {
             let alpha = 0;
 
             for (const direction of DIRECTIONS) {
-                const [offsetX, offsetY] = getOffsetForDirection(direction);
-    
                 const neighbour = this.neighbours[direction];
                 if (neighbour !== null) {
                     // Increasing based on the number of infections inversily proportional to the distance.
@@ -189,7 +187,7 @@ export class Cell {
                             this.nextState.dead;
 
         if (sumOfPeople != this.totalPopulation) {
-            console.error('Integrity check failed!');
+            console.assert(sumOfPeople != this.totalPopulation, 'Integrity check failed!');
         }
     }
 

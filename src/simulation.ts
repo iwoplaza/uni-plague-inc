@@ -1,4 +1,4 @@
-import { Cell, infectInState } from './cell';
+import { Cell, CellState, infectInState } from './cell';
 
 const drawCellStroke = false;
 
@@ -49,6 +49,12 @@ export class Simulation {
     private updatesPerSecond: number = 1;
     private prevUpdateTime: number = 0;
     private day: number = 0;
+    private summaryOfStates: CellState = {
+        susceptible: 0,
+        infectious: 0,
+        recovered: 0,
+        dead: 0,
+    };
 
     public readonly params: IParams = new Params();
 
@@ -56,6 +62,7 @@ export class Simulation {
         public readonly cellSize: number,
         private countryPath: Path2D,
         private canvas: HTMLCanvasElement,
+        private onTick?: () => void,
     ) {
         this.widthInCells = Math.floor(canvas.width / cellSize);
         this.heightInCells = Math.floor(canvas.height / cellSize);
@@ -121,15 +128,7 @@ export class Simulation {
 
         this.prevUpdateTime = Date.now();
     
-        /* Simulation logic goes here */
-        // this.cells.forEach(cell => {
-        //     if (cell === null) {
-        //         return;
-        //     }
-    
-        //     if (Math.random() > 0.9) cell.setColor('#ff0000');
-        //     else cell.setColor('#fff');
-        // });
+        // Simulation logic goes here
         this.performStep();
     
         //canvasContext.stroke(countryPath);
@@ -147,6 +146,13 @@ export class Simulation {
     }
 
     private performStep() {
+        this.summaryOfStates = {
+            susceptible: 0,
+            infectious: 0,
+            recovered: 0,
+            dead: 0,
+        };
+
         for (let x = 0; x < this.widthInCells; ++x) {
             for (let y = 0; y < this.heightInCells; ++y) {
                 const cell = this.cells[x][y];
@@ -156,7 +162,11 @@ export class Simulation {
                 }
 
                 cell.update(this, x, y);
-    
+
+                this.summaryOfStates.susceptible += cell.nextState.susceptible;
+                this.summaryOfStates.infectious += cell.nextState.infectious;
+                this.summaryOfStates.recovered += cell.nextState.recovered;
+                this.summaryOfStates.dead += cell.nextState.dead;
             }
         }
 
@@ -180,6 +190,10 @@ export class Simulation {
         }
 
         this.day++;
+
+        if (this.onTick) {
+            this.onTick();
+        }
     }
 
     public setUpdatesPerSecond(updatesPerSecond: number): void {
@@ -189,5 +203,13 @@ export class Simulation {
     public areCoordsInside(x: number, y: number) {
         return x >= 0 && x < this.widthInCells &&
                y >= 0 && y < this.heightInCells;
+    }
+
+    public getDay() {
+        return this.day;
+    }
+
+    public getSummaryOfStates(): CellState {
+        return this.summaryOfStates;
     }
 }

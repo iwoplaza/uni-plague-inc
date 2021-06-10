@@ -2,6 +2,7 @@ import './style/main.scss';
 import { PATH_DATA } from './config';
 import { Simulation } from './simulation';
 import { Chart, LineController, CategoryScale, LinearScale, PointElement, LineElement, Legend, Filler } from 'chart.js';
+import { CellState } from './cell';
 
 Chart.register(LineController, CategoryScale, LinearScale, PointElement, LineElement, Legend, Filler);
 
@@ -13,26 +14,28 @@ window.onload = () => {
     const days = [0] as number[];
     const datasets = [
         {
-            label: 'Suspectible',
-            data: [0] as number[],
-            borderColor: 'rgb(255, 0, 0)',
-            backgroundColor: 'rgb(255, 0, 0)',
-            fill: true,
-            
-        }, 
-        {
             label: 'Infectious',
             data: [0] as number[],
-            borderColor: 'rgb(0, 255, 0)',
-            backgroundColor: 'rgb(0, 255, 0)',
+            backgroundColor: 'rgb(40, 255, 100)',
+            border: false,
             fill: true,
+            radius: 0,
         },
+        {
+            label: 'Suspectible',
+            data: [0] as number[],
+            backgroundColor: 'rgb(255, 255, 255)',
+            border: false,
+            fill: true,
+            radius: 0,
+        }, 
         {
             label: 'Recovered',
             data: [0] as number[],
-            borderColor: 'rgb(0, 0, 255)',
-            backgroundColor: 'rgb(0, 0, 255)',
+            backgroundColor: 'rgb(60, 120, 255)',
             fill: true,
+            border: false,
+            radius: 0,
         },
     ];
 
@@ -43,6 +46,9 @@ window.onload = () => {
             datasets,
         },
         options: {
+            animation: {
+                duration: 0
+            },
             color: '#ffffff',
             responsive: true,
             plugins: {
@@ -54,7 +60,7 @@ window.onload = () => {
             },
             scales: {
                 x: { 
-                    display: true, 
+                    display: true,
                     title: {
                         display: true,
                         text: 'Day', 
@@ -65,7 +71,8 @@ window.onload = () => {
                     },
                 },
                 y: { 
-                    display: true,  
+                    display: true,
+                    stacked: true,
                     title: {
                         display: true,
                         text: 'SIR', 
@@ -79,19 +86,17 @@ window.onload = () => {
         },
     });
 
+    const MAX_VALUES = 100;
+
     const pushDay = (day: number, S: number, I: number, R: number) => {
         days.push(day);
-        datasets[0].data.push(S);
-        datasets[1].data.push(I);
+
+        datasets[0].data.push(I);
+        datasets[1].data.push(S);
         datasets[2].data.push(R);
+
         chart.update();
     }
-
-    // Logic here
-    pushDay(1, 100, 0, 0);
-    pushDay(2, 100, 100, 0);
-    pushDay(3, 100, 100, 100);
-    pushDay(4, 10000, 0, 0);
 
     // Initializing canvas
     const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -109,21 +114,25 @@ window.onload = () => {
     countryPath.addPath(new Path2D(PATH_DATA), transformMatrix);
 
     // Creating the simulation space
-    const simulation = new Simulation(5, countryPath, canvas);
+    const simulation = new Simulation(5, countryPath, canvas, () => {
+        // On each step
+        const summary: CellState = simulation.getSummaryOfStates();
+        pushDay(simulation.getDay(), summary.susceptible, summary.infectious, summary.recovered + summary.dead);
+    });
     simulation.generateCells();
     simulation.update();
 
     canvas.addEventListener('click', e => {
-      const { clientX, clientY } = e;
-      const { left, top } = canvas.getBoundingClientRect();
+        const { clientX, clientY } = e;
+        const { left, top } = canvas.getBoundingClientRect();
 
-      const xInPixels = clientX - left;
-      const yInPixels = clientY - top;
+        const xInPixels = clientX - left;
+        const yInPixels = clientY - top;
 
-      const x = Math.floor(xInPixels / simulation.cellSize);
-      const y = Math.floor(yInPixels / simulation.cellSize);
+        const x = Math.floor(xInPixels / simulation.cellSize);
+        const y = Math.floor(yInPixels / simulation.cellSize);
 
-      simulation.infectCell(x, y);
+        simulation.infectCell(x, y);
     });
 
     const timeSpeed = document.getElementById('time-speed');
