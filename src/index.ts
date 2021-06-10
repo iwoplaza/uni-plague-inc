@@ -147,4 +147,5 @@ window.onload = () => {
             simulation.setUpdatesPerSecond(Number(e.target.value));
         });
     }
+    simulation.render();
 };

@@ -46,7 +46,7 @@ export class Simulation {
     public cells: (Cell|null)[][];
 
     private paused: boolean = false;
-    private updatesPerSecond: number = 1;
+    private updatesPerSecond: number = 0;
     private prevUpdateTime: number = 0;
     private day: number = 0;
     private summaryOfStates: CellState = {
@@ -145,6 +145,25 @@ export class Simulation {
         }
     }
 
+    public render() {
+        for (let x = 0; x < this.widthInCells; ++x) {
+            for (let y = 0; y < this.heightInCells; ++y) {
+                const cell = this.cells[x][y];
+
+                if (cell === null) {
+                    continue;
+                }
+
+                if (drawCellStroke) {
+                    this.ctx.stroke(cell.getPath());
+                }
+        
+                this.ctx.fillStyle = cell.getColor();
+                this.ctx.fill(cell.getPath());
+            }
+        }
+    }
+
     private performStep() {
         this.summaryOfStates = {
             susceptible: 0,
@@ -180,12 +199,7 @@ export class Simulation {
 
                 cell.advanceCurrentState();
 
-                if (drawCellStroke) {
-                    this.ctx.stroke(cell.getPath());
-                }
-        
-                this.ctx.fillStyle = cell.getColor();
-                this.ctx.fill(cell.getPath());
+                this.render();
             }
         }
 

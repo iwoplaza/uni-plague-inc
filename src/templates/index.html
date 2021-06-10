@@ -8,11 +8,12 @@
 </head>
 <body>
     <div class="container">
-        <section class="time-manipulation">
-            <input type="range" id="time-speed" min="0" max="16" value="1" step="1">
-            <span><span id="time-speed-value">1</span> day per second</span>
-        </section>
         <main class="canvas-wrapper">
+            <section class="time-manipulation">
+                <span>Simulation speed</span>
+                <input type="range" id="time-speed" min="0" max="16" value="0" step="1">
+                <span><span id="time-speed-value">0</span> day per second</span>
+            </section>
             <canvas id="canvas"></canvas>
         </main>
         <section class="chart-container">
