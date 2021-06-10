@@ -15,7 +15,7 @@ window.onload = () => {
     const datasets = [
         {
             label: 'Infectious',
-            data: [0] as number[],
+            data: [] as number[],
             backgroundColor: 'rgb(40, 255, 100)',
             border: false,
             fill: true,
@@ -23,7 +23,7 @@ window.onload = () => {
         },
         {
             label: 'Suspectible',
-            data: [0] as number[],
+            data: [] as number[],
             backgroundColor: 'rgb(255, 255, 255)',
             border: false,
             fill: true,
@@ -31,7 +31,7 @@ window.onload = () => {
         }, 
         {
             label: 'Recovered',
-            data: [0] as number[],
+            data: [] as number[],
             backgroundColor: 'rgb(60, 120, 255)',
             fill: true,
             border: false,
