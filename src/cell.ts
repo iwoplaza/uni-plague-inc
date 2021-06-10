@@ -75,6 +75,15 @@ export function recoverInState(state: CellState, amount: number): void {
     state.recovered += amount;
 }
 
+function fluctuate(value: number, amount: number)
+{
+    return Math.max(0, Math.min(value + (Math.random() * 2 - 1) * amount, 1));
+}
+
+function inversePower(value: number, power: number) {
+    return 1 - Math.pow(1 - value, power);
+}
+
 export class Cell {
     // Visual state
     private readonly path: Path2D;
@@ -126,18 +135,30 @@ export class Cell {
     }
 
     update(simulation: Simulation, x: number, y: number) {
+        const {
+            internalInfectionProbability,
+            externalInfectionProbability,
+            stayingInInfectionProbability,
+            recoveryProbability,
+            internalFluctuations
+        } = simulation.params;
+
         if (this.nextState.infectious > 0) {
             // Recoveries / death
 
-            let probPerPerson = 1 - simulation.params.stayingInInfectionProbability;
+            let probPerPerson = 1 - stayingInInfectionProbability;
 
-            // Statistically, the 'probPerPerson' percentage of people should get removed,
+            // Statistically, the 'probPerPerson' percentage
+            // of people should get removed,
             // but we can introduce some randomness.
-            const randomness = simulation.params.internalFluctuations;
-            probPerPerson = Math.max(0, Math.min(probPerPerson + (Math.random() * 2 - 1) * randomness, 1));
+            probPerPerson = fluctuate(probPerPerson, internalFluctuations);
 
-            const amountToRemove = Math.round(this.nextState.infectious * probPerPerson);
-            const amountToRecover = Math.round(amountToRemove * simulation.params.recoveryProbability);
+            const amountToRemove = Math.round(
+                this.nextState.infectious * probPerPerson
+            );
+            const amountToRecover = Math.round(
+                amountToRemove * recoveryProbability
+            );
             recoverInState(this.nextState, amountToRecover);
             killInState(this.nextState, amountToRemove - amountToRecover);
         }
@@ -146,15 +167,18 @@ export class Cell {
             // Infecting within our own cell.
 
             // 1 - (1 - p)^i
-            let probability = 1 - Math.pow(1 - simulation.params.internalInfectionProbability,
-                this.nextState.infectious);
+            let probability = inversePower(
+                internalInfectionProbability,
+                this.nextState.infectious
+            );
 
             // Statistically, the 'probability' percentage of people should get infected,
             // but we can introduce some randomness.
-            const randomness = simulation.params.internalFluctuations;
-            probability = Math.max(0, Math.min(probability + (Math.random() * 2 - 1) * randomness, 1));
+            probability = fluctuate(probability, internalFluctuations);
 
-            const amountToInfect = Math.round(this.nextState.susceptible * probability);
+            const amountToInfect = Math.round(
+                this.nextState.susceptible * probability
+            );
             infectInState(this.nextState, amountToInfect);
         }
 
@@ -168,13 +192,16 @@ export class Cell {
             for (const direction of DIRECTIONS) {
                 const neighbour = this.neighbours[direction];
                 if (neighbour !== null) {
-                    // Increasing based on the number of infections inversily proportional to the distance.
-                    alpha += neighbour.currentState.infectious / DISTANCE_PER_DIRECTION[direction];
+                    // Increasing based on the number of infections
+                    // inversely proportional to the distance.
+                    const infectious = neighbour.nextState.infectious;
+                    const dist = DISTANCE_PER_DIRECTION[direction];
+                    alpha += infectious / dist;
                 }
             }
 
             // 1 - (1 - p)^i
-            let probability = 1 - Math.pow(1 - simulation.params.externalInfectionProbability, alpha);
+            let probability = inversePower(externalInfectionProbability, alpha);
             if (Math.random() < probability) {
                 infectInState(this.nextState, 1);
             }
